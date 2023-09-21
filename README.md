@@ -1,4 +1,4 @@
-# Beefree SDK live code and tutorials
+# Beefree SDK Demos
 
 ## Demo Code
 
@@ -9,3 +9,10 @@ The Beefree SDK team created this demo code during the Saved Rows live coding se
 #### References
  - [Saved Rows Overview](https://docs.beefree.io/save-rows/)
  - [Content Dialog](https://docs.beefree.io/content-dialog/#save-rows)
+
+### 2023.09.20: [Synced Rows live coding session](https://app.livestorm.co/p/725a6773-92d7-4f48-93de-16b63ead646c)
+
+Synchronization features like Synced Rows play a pivotal role when facilitating mass edits across assets by maintaining consistency and are particularly invaluable in collaborative settings - making your software the ideal solution for your users and their teams. 
+
+#### References
+ - [Synced Rows Overview](https://docs.beefree.io/save-rows/synced-rows)
