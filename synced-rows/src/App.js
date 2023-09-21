@@ -3,19 +3,30 @@ import React, { useEffect, useState } from 'react'
 import { v4 as uuidv4 } from 'uuid'
 import BeeFreeSDK from '@mailupinc/bee-plugin'
 import { useBackend, useContentDialog } from './hooks'
-import { Modal } from './components'
-import { SaveRow } from './components/ContentDialogs'
+import { Modal, Loader, Toolbar } from './components'
+import { SaveRow, EditSyncedRow, SaveSyncedRow } from './components/ContentDialogs'
 import './App.css'
 
 const App = () => {
   // Hooks
   const { config, asyncModal } = useContentDialog()
   const {
-    template, saveTemplate, saveRow, getRows, handleDeleteRow, handleEditRow,
+    csapiMerge, template, saveTemplate, saveRow, getRows, handleDeleteRow, handleEditRow, getRowTemplate,
   } = useBackend()
 
   // LOCAL STATE
-  const [currentTemplate] = useState(template)
+  const [currentTemplate, setCurrentTemplate] = useState(template)
+  const [editSingleRow, setEditSingleRow] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+
+  // UTILS
+  const syncTemplates = async (row) => {
+    setIsLoading(true)
+    setEditSingleRow(false)
+    const syncedTemplate = await csapiMerge(template, row)
+    setCurrentTemplate(prevTemplate => syncedTemplate || prevTemplate)
+    setIsLoading(false)
+  }
 
   // CALLBACKS
   const handleOnSave = async (template) => {
@@ -24,11 +35,18 @@ const App = () => {
 
   const handleOnSaveRow = async (rowTemplate) => {
     const row = JSON.parse(rowTemplate)
+    // Synced Row
+    if (editSingleRow) {
+      row.synced = true // Override synced property
+      syncTemplates(row)
+    }
     saveRow(row)
   }
 
   const handleOnChange = async (template) => {
-    await saveTemplate(JSON.parse(template))
+    if (!editSingleRow) {
+      await saveTemplate(JSON.parse(template))
+    }
   }
 
   // HOOKS
@@ -38,13 +56,35 @@ const App = () => {
   }
 
   // CONTENT DIALOG HANDLERS
-  const handleSaveRow = async (resolve, reject, row) => {
-    // Save New Row
-    const { name = '', synced = false } = await asyncModal(SaveRow, row)
-    if (name) {
-      resolve({ name, guid: row?.metadata?.guid ?? uuidv4() }, { synced })
+  const handleEditSyncedRow = async (resolve, reject, row) => {
+    // Open content dialog "Edit Synced Row Component" - passing it the row
+    const { synced } = await asyncModal(EditSyncedRow, row)
+    if (synced === true) {
+      // Reload builder with the row, in edit single row mode
+      setEditSingleRow(true)
+      setCurrentTemplate(getRowTemplate(row))
+      resolve(true)
+    } else if (synced === false) {
+      // User selected a standard row
+      resolve(false)
+    } else {
+      // User clicked the [X] button
+      resolve(true)
     }
-    reject('')
+  }
+
+  const handleSaveRow = async (resolve, reject, row) => {
+    if (editSingleRow) {
+      // Save Existing Synced Row
+      resolve(row.metadata, { synced: true })
+    } else {
+      // Save New Row
+      const { name = '', synced = false } = await asyncModal(SaveSyncedRow, row)
+      if (name) {
+        resolve({ name, guid: row?.metadata?.guid ?? uuidv4() }, { synced })
+      }
+      reject('')
+    }
   }
 
   const handleOnDeleteRow = async (resolve, reject, { row }) => {
@@ -66,6 +106,12 @@ const App = () => {
 
   // CONFIGURATION
   const contentDialog = {
+    editSyncedRow: {
+      label: 'Edit synced row',
+      description: 'This row is used in other designs. You can decide to update all the designs or transform this single row into a regular one',
+      notPermittedDescription: 'Your plan does not permit you to edit it. Please contact your account administrator',
+      handler: handleEditSyncedRow,
+    },
     saveRow: {
       handler: handleSaveRow,
     },
@@ -96,8 +142,9 @@ const App = () => {
   }
 
   const clientConfig = {
-    uid: 'saved-rows-demo-uid',
+    uid: 'synced-rows-demo-uid',
     container: 'beefree-sdk-container',
+    workspace: { editSingleRow },
     saveRows: true,
     onSave: handleOnSave,
     onSaveRow: handleOnSaveRow,
@@ -126,7 +173,9 @@ const App = () => {
   return (
     <main className="App">
       <section id="beefree-sdk-container" />
+      <Loader isLoading={isLoading} />
       <Modal config={config} />
+      <Toolbar />
     </main>
   )
 }

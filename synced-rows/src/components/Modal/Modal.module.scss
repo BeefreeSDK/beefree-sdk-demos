@@ -1,0 +1,37 @@
+.wrapper {
+  position: relative;
+}
+
+.modalWindow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  right: auto;
+  bottom: auto;
+  margin-right: -50%;
+  transform: translate(-50%, -50%);
+  outline: none;
+  padding: 0px;
+  z-index: 40;
+  width: 620px !important;
+  background-color: white;
+  border: 1px #EEE solid;
+  border-radius: 15px;
+  padding: 1em;
+}
+
+.titleBar {
+  min-height: 45px;
+  .close {
+    float: right;
+    height: 40px;
+    width: 40px;
+    cursor: pointer;
+    background-color: #909496;
+  }
+}
+
+.content {
+  padding: .5em;
+  height: 100% !important;
+}

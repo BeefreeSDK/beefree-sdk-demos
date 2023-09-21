@@ -1,5 +1,5 @@
-import EditRow from './EditRow/EditRow'
+import SaveRow from './SaveRow/SaveRow'
 
 export {
-  EditRow,
+  SaveRow,
 }

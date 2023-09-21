@@ -14,37 +14,24 @@
   padding: 0px;
   z-index: 40;
   width: 620px !important;
-}
-
-.rounded {
-  border-radius: 8px !important;
-}
-
-.square {
-  border-radius: 0 !important;
+  background-color: white;
+  border: 1px #EEE solid;
+  border-radius: 15px;
+  padding: 1em;
 }
 
 .titleBar {
-  border-bottom: 1px solid #eee;
-  min-height: 30px;
-  line-height: 35px;
-
-  > div {
-    padding: 5px 11px;
-    margin: 10px !important;
-    font-size: 21px;
-    display: inline-block;
-    font-weight: normal;
-  }
+  min-height: 45px;
   .close {
     float: right;
-    width: 50px;
+    height: 40px;
+    width: 40px;
     cursor: pointer;
-    background-color:#909496;
+    background-color: #909496;
   }
 }
 
 .content {
-  padding: 20px;
+  padding: .5em;
   height: 100% !important;
 }
